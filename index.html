@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Game Alkitab Anak</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--langit:#e6f3ff;--navy:#1b2a4e;--mentari:#ffc93c;--rumput:#2fa96b;--koral:#e8575a;--garis:#c9d8ef}
+*{box-sizing:border-box}
+body{margin:0;background:var(--langit);color:var(--navy);font-family:"Baloo 2","Trebuchet MS",system-ui,sans-serif;font-size:17px}
+header{background:var(--navy);color:#fff;padding:18px 16px 20px;text-align:center;border-bottom:6px solid var(--mentari)}
+h1{margin:0 0 12px;font-size:1.5rem}
+h2{margin:0 0 10px;font-size:1.25rem;line-height:1.35}
+select{width:100%;max-width:440px;padding:12px;font:inherit;border:0;border-radius:14px;color:var(--navy)}
+main{max-width:480px;margin:0 auto;padding:16px}
+.kartu{background:#fff;border:2px solid var(--garis);border-radius:18px;padding:16px;margin-bottom:14px}
+.info{font-size:.95rem;color:#51608a;margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lv{padding:14px 8px;font:inherit;background:#fff;color:var(--navy);border:2px solid var(--garis);border-radius:18px;cursor:pointer;line-height:1.3}
+.lv:disabled{opacity:.5;cursor:not-allowed}
+.lv b{display:block;font-size:1.15rem}
+.opt{display:block;width:100%;margin:8px 0;padding:13px 14px;font:inherit;text-align:left;background:#fff;color:var(--navy);border:2px solid var(--garis);border-radius:14px;cursor:pointer}
+.opt.ok{background:#d6f3e4;border-color:var(--rumput)}
+.opt.no{background:#fde1e1;border-color:var(--koral)}
+.btn{display:inline-block;margin:6px 6px 0 0;padding:12px 18px;font:inherit;font-weight:700;color:var(--navy);background:var(--mentari);border:0;border-radius:14px;cursor:pointer}
+.btn.abu{background:#fff;border:2px solid var(--garis)}
+.petunjuk{margin:6px 0;padding:10px 12px;background:#fff7d6;border-radius:12px}
+.status{display:flex;justify-content:space-between;font-size:.95rem;color:#51608a;margin-bottom:8px}
+.umpan{margin:10px 0 0;font-weight:700}
+.besar{font-size:2.4rem;text-align:center;margin:4px 0}
+button:focus-visible,select:focus-visible{outline:3px solid var(--mentari);outline-offset:2px}
+@keyframes muncul{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.muncul{animation:muncul .35s ease-out}
+@keyframes masuk{from{opacity:0;transform:translateX(-18px)}}
+.muncul .opt{animation:masuk .4s ease-out backwards}
+.muncul .opt:nth-child(2){animation-delay:.08s}.muncul .opt:nth-child(3){animation-delay:.16s}.muncul .opt:nth-child(4){animation-delay:.24s}
+.titik{display:flex;gap:4px;margin-bottom:10px}.titik i{flex:1;height:8px;border-radius:4px;background:var(--garis)}
+.titik i.s{background:var(--rumput)}.titik i.k{background:var(--mentari)}
+.maskot{font-size:2.6rem;text-align:center;animation:goyang 2s ease-in-out infinite}
+@keyframes goyang{50%{transform:translateY(-6px) rotate(6deg)}}
+@keyframes geter{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.geter{animation:geter .4s}
+@keyframes lompat{40%{transform:scale(1.05)}}
+.opt.ok{animation:lompat .4s}
+.opt:active,.btn:active{transform:scale(.97)}
+.konfeti{position:fixed;top:-30px;font-size:1.6rem;pointer-events:none;animation:kf 1.6s ease-in forwards;z-index:9}
+@keyframes kf{to{transform:translateY(105vh) rotate(360deg);opacity:.3}}
+#medan{position:relative;height:380px;overflow:hidden;background:#d8ecff;border-radius:14px}
+.jatuh{position:absolute;top:-50px;padding:10px 12px;font:inherit;border:2px solid var(--garis);border-radius:14px;background:#fff;color:var(--navy);animation:turun 4s linear forwards;cursor:pointer}
+@keyframes turun{to{transform:translateY(440px)}}
+.medan2{position:relative;height:90px;background:#d8ecff;border-radius:14px;overflow:hidden;margin-bottom:10px}
+.tengah{position:absolute;left:41%;width:18%;top:0;bottom:0;background:#bfe8cf}
+.gol{position:absolute;top:16px;font-size:3rem;transform:translateX(-50%)}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.hewan{font-size:2rem}
+.pilih{border-color:var(--mentari)!important;transform:scale(1.08)}
+.masuk{opacity:.35;transform:scale(.7);transition:.4s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.lv.cocok{opacity:1;background:#d6f3e4;border-color:var(--rumput)}.buka{background:#fff7d6}.hewan small{display:block;font-size:.6rem;line-height:1.1}
+.kbd{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.kbd button{padding:10px 0;font:inherit;font-weight:700;border:2px solid var(--garis);border-radius:10px;background:#fff;color:var(--navy);cursor:pointer}.kbd button:disabled{opacity:.3}
+.dua{display:grid;grid-template-columns:1fr 1fr;gap:10px}.dua .opt{font-size:.85rem;padding:10px}
+.gk{display:grid;gap:3px;margin-bottom:10px}.gk button{aspect-ratio:1;padding:0;font:inherit;font-weight:700;border:1px solid var(--garis);background:#fff;color:var(--navy);border-radius:6px;font-size:.95rem;cursor:pointer}.gk button.pilih{background:var(--mentari)}.gk button.cocok{background:#bfe8cf}
+.kata{display:flex;flex-wrap:wrap;gap:8px}.kata .lv{padding:10px 12px}
+.mem{font-size:.9rem;line-height:1.2;min-height:86px}.mem small,.hewan.mem small{font-size:.75rem;font-weight:700}
+.ark{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.pasang{display:flex;gap:8px;align-items:center;justify-content:center}.pasang span{font-size:2rem}
+.slot{font-size:2rem;padding:10px;background:#fff;border:2px dashed var(--garis);border-radius:14px;opacity:.3;filter:grayscale(1);cursor:pointer}.slot.isi{opacity:1;filter:none;border:2px solid var(--rumput);background:#d6f3e4}
+.tray{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tg{display:grid;gap:2px;margin-bottom:10px}.tc{position:relative}.tc input{width:100%;aspect-ratio:1;text-align:center;font:inherit;font-weight:700;text-transform:uppercase;border:2px solid var(--garis);border-radius:6px;padding:0;color:var(--navy);background:#fff}.tc sup{position:absolute;top:1px;left:3px;font-size:.55rem;color:#51608a;pointer-events:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>📖 Game Alkitab Anak</h1>
+  <select id="pilih" aria-label="Pilih game"></select>
+</header>
+<main id="app"></main>
+
+<script>
+/* ============ DAFTAR GAME ============
+   [nomor, nama, pakai level?, sudah dibuat?] */
+const DAFTAR=[
+ [1,"Tebak Tokoh Alkitab",1,1],[2,"Susun Kalimat Kisah",1,1],[3,"Tebak Huruf Alkitab",1,1],
+ [4,"Memory Card: Tokoh dan Bendanya",1,1],[5,"Isi Titik-titik Kisah",1,1],[6,"Urutkan Kisah",1,1],
+ [7,"Teka-teki Silang Alkitab",1,1],[8,"Cari Kata Alkitab",1,1],
+ [9,"Puzzle Pasangan Hewan Bahtera",0,1],[10,"Daud Melempar Batu",0,1],[11,"Hafal Urutan 66 Kitab",0,1],
+ [12,"Peta Perjalanan Paulus",0,1],[13,"Tebak Gambar Mukjizat",0,1],[14,"Buah Roh",0,1],[15,"Jodohkan Benda & Tempat Alkitab",0,1]
+];
+
+/* ============ DATA: TEBAK TOKOH ============
+   Format: "Nama|petunjuk sulit|petunjuk sedang|petunjuk mudah" (5 level x 10) */
+const TOKOH=[
+[
+"Adam|Allah membentuk aku dari debu tanah.|Aku tinggal di Taman Eden.|Aku manusia pertama.",
+"Hawa|Aku dibentuk dari tulang rusuk.|Aku tergoda oleh ular.|Aku wanita pertama.",
+"Nuh|Aku membuat kapal yang sangat besar.|Aku mengumpulkan hewan berpasangan.|Pelangi adalah tanda janji Allah kepadaku.",
+"Musa|Aku ditemukan di keranjang di Sungai Nil.|Aku menerima Sepuluh Perintah Allah.|Aku memimpin Israel keluar dari Mesir.",
+"Daud|Dulu aku gembala domba.|Aku menulis banyak mazmur.|Aku mengalahkan Goliat dengan umban.",
+"Daniel|Aku bekerja pada raja Babel.|Aku berdoa tiga kali sehari.|Aku dilempar ke gua singa.",
+"Yunus|Aku lari dari perintah Allah.|Aku naik kapal ke Tarsis.|Aku tiga hari dalam perut ikan besar.",
+"Maria|Malaikat Gabriel menemuiku.|Aku tinggal di Nazaret.|Aku ibu Yesus.",
+"Petrus|Aku nelayan di Galilea.|Aku berjalan di atas air menuju Yesus.|Aku menyangkal Yesus tiga kali.",
+"Simson|Aku orang nazir sejak lahir.|Kekuatanku ada pada rambutku.|Delila memotong rambutku."
+],[
+"Abraham|Allah menyuruhku pergi dari Haran.|Allah berjanji keturunanku sebanyak bintang.|Aku hampir mempersembahkan anakku Ishak.",
+"Ishak|Aku anak yang lama dijanjikan.|Ayahku hampir mempersembahkan aku.|Istriku bernama Ribka.",
+"Yakub|Aku punya kembaran bernama Esau.|Aku bermimpi tentang tangga ke surga.|Namaku diganti menjadi Israel.",
+"Yusuf|Aku punya jubah warna-warni.|Saudara-saudaraku menjualku.|Aku menjadi penguasa di Mesir.",
+"Rut|Aku berasal dari Moab.|Aku setia kepada mertuaku Naomi.|Aku memungut gandum di ladang Boas.",
+"Ester|Aku dibesarkan oleh Mordekhai.|Aku menjadi ratu Persia.|Aku menyelamatkan bangsa Yahudi dari Haman.",
+"Elia|Aku nabi pada zaman raja Ahab.|Api turun dari langit di Gunung Karmel.|Aku naik ke surga dengan kereta berapi.",
+"Zakheus|Aku bertubuh pendek.|Aku pemungut cukai di Yerikho.|Aku naik pohon ara untuk melihat Yesus.",
+"Yohanes Pembaptis|Aku makan belalang dan madu hutan.|Aku berseru di padang gurun.|Aku membaptis Yesus di Sungai Yordan.",
+"Yudas Iskariot|Aku salah satu dari dua belas murid.|Aku memegang kantong uang.|Aku menyerahkan Yesus dengan ciuman."
+],[
+"Yosua|Aku pengintai yang setia ke Kanaan.|Aku menggantikan Musa.|Tembok Yerikho runtuh di bawah pimpinanku.",
+"Debora|Aku duduk di bawah pohon korma.|Aku hakim dan nabiah.|Aku memimpin Israel bersama Barak.",
+"Samuel|Ibuku Hana berdoa memintaku.|Aku dilayankan kepada imam Eli di Silo.|Aku mengurapi Saul dan Daud.",
+"Saul|Aku lebih tinggi dari semua orang.|Aku sedang mencari keledai ayahku.|Aku raja Israel yang pertama.",
+"Salomo|Aku meminta hikmat kepada Allah.|Aku memutuskan perkara dua ibu dan satu bayi.|Aku membangun Bait Allah.",
+"Elisa|Aku dipanggil saat sedang membajak.|Aku menerima jubah Elia.|Aku menyembuhkan Naaman dari kusta.",
+"Matius|Aku pemungut cukai.|Yesus memanggilku untuk mengikut Dia.|Aku menulis Injil yang pertama.",
+"Paulus|Dulu namaku Saulus.|Aku bertemu Yesus dalam cahaya di jalan ke Damsyik.|Aku rasul bagi bangsa-bangsa lain.",
+"Lazarus|Aku tinggal di Betania.|Saudariku bernama Marta dan Maria.|Yesus membangkitkan aku dari kubur.",
+"Marta|Aku tinggal di Betania.|Aku sibuk melayani saat Yesus bertamu.|Saudariku Maria duduk dekat kaki Yesus."
+],[
+"Gideon|Aku dua kali meminta tanda dengan bulu domba.|Allah mengurangi pasukanku menjadi 300 orang.|Aku mengalahkan Midian dengan sangkakala dan obor.",
+"Rahab|Aku tinggal di tembok kota Yerikho.|Aku menyembunyikan dua pengintai.|Tali merah di jendelaku menyelamatkan keluargaku.",
+"Hana|Aku lama tidak punya anak.|Aku berdoa dengan sungguh-sungguh di Silo.|Anakku Samuel kuserahkan kepada Tuhan.",
+"Nehemia|Aku juru minuman raja Persia.|Aku pulang ke Yerusalem.|Aku memimpin pembangunan kembali tembok kota.",
+"Yeremia|Aku dipanggil saat masih muda.|Aku dikenal sebagai nabi peratap.|Aku menubuatkan kehancuran Yerusalem.",
+"Barnabas|Namaku berarti anak penghiburan.|Aku menjual ladangku untuk jemaat.|Aku menemani Paulus dalam pelayanan awal.",
+"Timotius|Ibuku Eunike dan nenekku Lois.|Aku masih muda saat melayani.|Paulus menulis dua surat kepadaku.",
+"Nikodemus|Aku anggota Mahkamah Agama.|Aku datang kepada Yesus pada waktu malam.|Yesus berkata aku harus dilahirkan kembali.",
+"Ayub|Aku kaya, lalu kehilangan segalanya.|Tiga temanku datang menghiburku.|Aku tetap setia dan Allah memulihkan aku.",
+"Naaman|Aku panglima tentara Aram.|Aku sakit kusta.|Aku tujuh kali mandi di Sungai Yordan."
+],[
+"Elisabet|Aku sudah tua dan dianggap mandul.|Aku kerabat Maria.|Anakku bernama Yohanes Pembaptis.",
+"Simeon|Aku orang benar di Yerusalem.|Roh Kudus berkata aku akan melihat Mesias sebelum mati.|Aku menggendong bayi Yesus di Bait Allah.",
+"Natan|Aku nabi pada zaman raja Daud.|Aku bercerita tentang domba kesayangan seorang miskin.|Aku menegur Daud tentang Batsyeba.",
+"Belsyazar|Aku raja Babel.|Aku berpesta dengan perkakas Bait Allah.|Sebuah tangan menulis di dinding istanaku.",
+"Lidia|Aku pedagang kain ungu.|Aku berasal dari kota Tiatira.|Aku percaya lewat khotbah Paulus di Filipi.",
+"Eutikhus|Aku duduk di tepi jendela.|Aku mengantuk saat Paulus berkhotbah panjang.|Aku jatuh dari lantai tiga lalu dihidupkan kembali.",
+"Matias|Aku mengikut Yesus sejak awal.|Namaku terpilih lewat undian.|Aku menggantikan Yudas Iskariot.",
+"Ezra|Aku imam dan ahli Taurat.|Aku memimpin gelombang pulang dari Babel.|Aku membacakan Taurat kepada seluruh umat.",
+"Apolos|Aku berasal dari Aleksandria.|Aku pandai berbicara tentang Kitab Suci.|Priskila dan Akwila menjelaskan jalan Allah kepadaku.",
+"Stefanus|Aku salah satu dari tujuh diaken.|Aku penuh Roh Kudus dan hikmat.|Aku martir yang pertama."
+]];
+
+/* ============ DATA: KUIS ============
+   Format: "Pertanyaan|Jawaban benar|salah 1|salah 2|salah 3" (5 level x 10) */
+const KUIS=[
+[
+"Siapa yang membuat bahtera?|Nuh|Musa|Daud|Abraham",
+"Siapa yang dilempar ke gua singa?|Daniel|Yunus|Petrus|Yusuf",
+"Siapa yang mengalahkan Goliat?|Daud|Simson|Saul|Musa",
+"Di kota mana Yesus dilahirkan?|Betlehem|Nazaret|Yerusalem|Yerikho",
+"Berapa jumlah murid Yesus?|12|7|10|40",
+"Siapa ibu Yesus?|Maria|Marta|Hana|Ester",
+"Apa yang Allah ciptakan pada hari pertama?|Terang|Binatang|Manusia|Matahari",
+"Siapa yang ditelan ikan besar?|Yunus|Daniel|Nuh|Elia",
+"Siapa yang memimpin Israel keluar dari Mesir?|Musa|Yosua|Daud|Salomo",
+"Apa nama kitab pertama dalam Alkitab?|Kejadian|Keluaran|Mazmur|Matius"
+],[
+"Berapa hari hujan turun pada zaman Nuh?|40 hari|7 hari|12 hari|100 hari",
+"Siapa kakak Habel?|Kain|Set|Esau|Ishak",
+"Siapa yang dijual saudara-saudaranya ke Mesir?|Yusuf|Benyamin|Yehuda|Ruben",
+"Berapa roti dan ikan yang dipakai Yesus untuk memberi makan 5.000 orang?|5 roti dan 2 ikan|7 roti dan 3 ikan|2 roti dan 5 ikan|12 roti dan 2 ikan",
+"Siapa yang menyangkal Yesus tiga kali?|Petrus|Yohanes|Yakobus|Tomas",
+"Siapa yang membaptis Yesus di Sungai Yordan?|Yohanes Pembaptis|Petrus|Paulus|Andreas",
+"Siapa raja Israel yang pertama?|Saul|Daud|Salomo|Samuel",
+"Di kota mana Yesus mengubah air menjadi anggur?|Kana|Kapernaum|Betania|Nain",
+"Allah berbicara kepada Musa dari apa?|Semak yang menyala|Awan|Gunung|Pohon palem",
+"Siapa pemungut cukai yang naik pohon untuk melihat Yesus?|Zakheus|Matius|Lewi|Nikodemus"
+],[
+"Berapa jumlah kitab dalam Alkitab?|66|39|27|70",
+"Apa kitab pertama dalam Perjanjian Baru?|Matius|Markus|Kisah Para Rasul|Roma",
+"Siapa istri Abraham?|Sara|Ribka|Rahel|Lea",
+"Siapa yang kehilangan kekuatan saat rambutnya dipotong?|Simson|Daud|Gideon|Saul",
+"Siapa ratu yang menyelamatkan bangsa Yahudi di Persia?|Ester|Rut|Debora|Hana",
+"Di gunung mana Musa menerima Sepuluh Perintah Allah?|Sinai|Karmel|Zaitun|Nebo",
+"Siapa yang namanya diganti menjadi Israel?|Yakub|Abraham|Ishak|Yusuf",
+"Berapa jumlah anak laki-laki Yakub?|12|7|10|3",
+"Siapa nabi yang naik ke surga dengan kereta berapi?|Elia|Elisa|Yesaya|Yeremia",
+"Siapa mertua Rut?|Naomi|Hana|Debora|Ester"
+],[
+"Siapa yang menggantikan Elia sebagai nabi?|Elisa|Yesaya|Samuel|Yosua",
+"Siapa yang memimpin Israel masuk ke Tanah Kanaan setelah Musa?|Yosua|Kaleb|Harun|Gideon",
+"Kota mana yang temboknya runtuh setelah dikelilingi Israel?|Yerikho|Betlehem|Damsyik|Niniwe",
+"Siapa putra Daud yang terkenal dengan hikmatnya?|Salomo|Absalom|Yonatan|Adonia",
+"Siapa yang menulis Kitab Kisah Para Rasul?|Lukas|Markus|Yohanes|Petrus",
+"Saulus kemudian dikenal dengan nama apa?|Paulus|Petrus|Barnabas|Silas",
+"Siapa hakim perempuan yang memimpin Israel bersama Barak?|Debora|Ester|Rut|Hana",
+"Di jalan menuju kota mana Saulus bertemu Yesus?|Damsyik|Yerusalem|Antiokhia|Efesus",
+"Siapa anak kecil yang dipanggil Allah di Silo?|Samuel|Daud|Yeremia|Daniel",
+"Siapa tiga sahabat Daniel yang dilempar ke perapian?|Sadrakh, Mesakh, dan Abednego|Petrus, Yakobus, dan Yohanes|Sem, Ham, dan Yafet|Kain, Habel, dan Set"
+],[
+"Siapa ayah Yohanes Pembaptis?|Zakharia|Yusuf|Simeon|Elkana",
+"Siapa yang mengurapi Daud menjadi raja?|Samuel|Natan|Elia|Eli",
+"Siapa nabi yang menegur Daud setelah dosanya dengan Batsyeba?|Natan|Elisa|Yesaya|Gad",
+"Siapa nama ayah Daud?|Isai|Obed|Boas|Yakub",
+"Siapa raja Babel yang melihat tulisan di dinding?|Belsyazar|Nebukadnezar|Koresh|Darius",
+"Berapa orang pasukan Gideon yang tersisa melawan Midian?|300|1.000|12.000|3.000",
+"Siapa pedagang kain ungu dari Tiatira yang percaya lewat Paulus?|Lidia|Priskila|Dorkas|Lois",
+"Siapa yang dipilih menggantikan Yudas Iskariot?|Matias|Barnabas|Silas|Stefanus",
+"Di pulau mana Yohanes menerima penglihatan Kitab Wahyu?|Patmos|Kreta|Siprus|Malta",
+"Siapa pemuda yang jatuh dari jendela saat Paulus berkhotbah?|Eutikhus|Timotius|Titus|Apolos"
+]];
+
+const GAME={1:{mode:"tokoh",data:TOKOH}};
+const NAMA_LEVEL=["Mudah","Lumayan","Sedang","Sulit","Ahli"];
+const LULUS=7;
+
+/* ============ ALAT BANTU ============ */
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const acak=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let prog={};
+try{prog=JSON.parse(localStorage.getItem("alkitab-anak")||"{}")}catch(e){}
+const simpan=()=>{try{localStorage.setItem("alkitab-anak",JSON.stringify(prog))}catch(e){}};
+const BUKA_SEMUA=location.search.includes("buka=1"); // untuk uji coba: index.html?buka=1
+const nilai=(g,l)=>(prog[g]||{})[l]||0;
+const terbuka=(g,l)=>BUKA_SEMUA||l===1||nilai(g,l-1)>=LULUS;
+const bintang=n=>n>=10?"⭐⭐⭐":n>=9?"⭐⭐":n>=LULUS?"⭐":"☆";
+const namaGame=g=>DAFTAR.find(d=>d[0]===g)[1];
+
+/* ============ DROPDOWN ============ */
+(function isiPilihan(){
+  const s=$("#pilih");
+  const opsi=d=>`<option value="${d[0]}" ${d[3]?"":"disabled"}>${d[0]}. ${d[1]}${d[3]?"":" (segera)"}</option>`;
+  s.innerHTML=`<option value="">— Pilih game —</option>
+   <optgroup label="Pakai level">${DAFTAR.filter(d=>d[2]).map(opsi).join("")}</optgroup>
+   <optgroup label="Tanpa level">${DAFTAR.filter(d=>!d[2]).map(opsi).join("")}</optgroup>`;
+  s.onchange=()=>{const g=+s.value;g?((GAME[g]||MULAI[g])?menuLevel(g):MINI[g]()):beranda()};
+})();
+
+/* ============ LAYAR ============ */
+function beranda(){
+  app.innerHTML=`<div class="kartu"><div class="besar">🕊️</div>
+  <h2>Selamat datang!</h2><p class="info">Pilih game dari daftar di atas, lalu mulai bermain dan belajar tentang firman Tuhan.</p></div>`;
+}
+
+function menuLevel(g){
+  const tombol=[1,2,3,4,5].map(l=>{
+    const buka=terbuka(g,l);
+    return `<button class="lv" ${buka?"":"disabled"} onclick="mulai(${g},${l})">
+      <b>Level ${l}</b>${NAMA_LEVEL[l-1]}<br>${buka?bintang(nilai(g,l)):"🔒"}</button>`;
+  }).join("");
+  app.innerHTML=`<div class="kartu"><h2>${namaGame(g)}</h2>
+   <p class="info">Jawab benar minimal ${LULUS} dari 10 soal untuk membuka level berikutnya.</p></div>
+   <div class="grid">${tombol}</div>
+   <p class="info" style="margin-top:14px"><button class="btn abu" onclick="reset(${g})">Ulangi dari awal</button></p>`;
+}
+
+let S={};
+function mulai(g,l){
+  if(MULAI[g]) return MULAI[g](l);
+  const {mode,data}=GAME[g];
+  const baris=acak(data[l-1].map(s=>s.split("|")));
+  const nama=data[l-1].map(s=>s.split("|")[0]);
+  const items=baris.map(b=>mode==="kuis"
+    ?{tanya:b[0],jawab:b[1],opsi:acak(b.slice(1,5))}
+    :{jawab:b[0],petunjuk:b.slice(1,4),opsi:acak([b[0],...acak(nama.filter(n=>n!==b[0])).slice(0,3)])});
+  S={g,l,mode,items,i:0,benar:0,poin:0,p:1,kunci:false,beruntun:0};baru();
+  soal();
+}
+
+function soal(){
+  if(S.i>=S.items.length) return hasil();
+  const it=S.items[S.i];
+  const titik=S.items.map((_,n)=>`<i class="${n<S.i?"s":n===S.i?"k":""}"></i>`).join("");
+  const atas=`<div class="titik">${titik}</div><div class="status"><span>${S.l?"Level "+S.l+" • ":""}Soal ${S.i+1} dari ${S.items.length}</span><span>${S.beruntun>1?"🔥"+S.beruntun+" ":""}✅ ${S.benar}</span></div><div class="maskot">${S.m}</div>`;
+  let isi;
+  if(S.mode==="kuis"){
+    isi=`<h2>${it.tanya}</h2>`;
+  }else{
+    const daftar=it.petunjuk.slice(0,S.p).map((t,n)=>`<div class="petunjuk">💡 <small>Petunjuk ${n+1} dari 3</small><br>${t}</div>`).join("");
+    const lagi=!S.kunci&&S.p<3?`<button class="btn abu" onclick="petunjuk()">Petunjuk berikutnya (poin berkurang)</button>`:"";
+    isi=`<h2>Siapa aku?</h2>${daftar}${lagi}`;
+  }
+  const pilihan=it.opsi.map((o,n)=>`<button class="opt" onclick="jawab(${n})">${o}</button>`).join("");
+  app.innerHTML=`<div class="kartu${S.baru?" muncul":""}">${atas}${isi}<div id="pilihan">${pilihan}</div><div id="umpan"></div></div>`;S.baru=false;
+}
+
+function petunjuk(){
+  if(S.kunci||S.p>=3) return;
+  S.p++;
+  soal();
+}
+
+function jawab(n){
+  if(S.kunci) return;
+  S.kunci=true;
+  const it=S.items[S.i];
+  const benar=it.opsi[n]===it.jawab;
+  document.querySelectorAll("#pilihan .opt").forEach((b,k)=>{
+    b.disabled=true;
+    if(it.opsi[k]===it.jawab) b.classList.add("ok");
+    else if(k===n) b.classList.add("no");
+  });
+  if(benar){S.benar++;S.beruntun++; if(S.mode==="tokoh") S.poin+=4-S.p;}else S.beruntun=0;
+  efek(benar);
+  const lanjut=S.i===S.items.length-1?"Lihat hasil":"Lanjut ▶";
+  $("#umpan").innerHTML=`<p class="umpan">${benar?"🎉 Benar!":"Jawaban yang benar: "+it.jawab}</p>
+   <button class="btn" onclick="berikut()">${lanjut}</button>`;
+  const lagi=document.querySelector("#app .btn.abu");
+  if(lagi) lagi.remove();
+}
+
+function berikut(){S.i++;S.p=1;S.kunci=false;baru();soal();}
+
+function hasil(){
+  const {g,l,benar}=S;
+  const sk=Math.round(S.benar*10/S.items.length);
+  const lulus=!S.bebas&&sk>=LULUS;
+  if(!S.bebas&&sk>nilai(g,l)){prog[g]=prog[g]||{};prog[g][l]=sk;simpan();}
+  const pesan=sk===10?"Sempurna! Luar biasa!":sk>=LULUS?(S.bebas?"Hebat sekali!":"Hebat! Kamu lulus level ini."):"Ayo coba lagi, kamu pasti bisa!";
+  const poin=S.mode==="tokoh"?`<p class="info" style="text-align:center">Poin: ${S.poin} dari 30</p>`:"";
+  let tombol=`<button class="btn" onclick="${S.bebas?"MINI["+g+"]()":"mulai("+g+","+l+")"}">🔁 Main lagi</button>`;
+  if(lulus&&l<5) tombol=`<button class="btn" onclick="mulai(${g},${l+1})">Level ${l+1} ▶</button>`+tombol;
+  if(!S.bebas) tombol+=`<button class="btn abu" onclick="menuLevel(${g})">Pilih level</button>`;
+  const tamat=lulus&&l===5?`<p class="umpan" style="text-align:center">🏆 Kamu sudah menamatkan semua level!</p>`:"";
+  app.innerHTML=`<div class="kartu"><div class="besar">${bintang(S.bebas?benar:sk)}</div>
+   <h2 style="text-align:center">${benar} dari ${S.items.length} benar</h2>
+   <p class="info" style="text-align:center">${pesan}</p>${poin}${tamat}<div>${tombol}</div></div>`;
+}
+
+function reset(g){
+  if(!confirm("Hapus semua kemajuan game ini?")) return;
+  delete prog[g];simpan();menuLevel(g);
+}
+
+/* ============ EFEK ============ */
+const MASKOT=["🐑","🕊️","🌈","🦁","🐟","🍞","⭐","🐪","🌿","👑"];
+function baru(){S.m=MASKOT[Math.floor(Math.random()*MASKOT.length)];S.baru=true;}
+function efek(benar){
+  if(benar){
+    for(let n=0;n<16;n++){const e=document.createElement("span");e.className="konfeti";e.textContent=["⭐","🎉","✨","💛"][n%4];
+      e.style.left=Math.random()*95+"%";e.style.animationDelay=Math.random()*.4+"s";document.body.append(e);setTimeout(()=>e.remove(),2200);}
+  }else{const k=document.querySelector(".kartu");if(k){k.classList.remove("geter");void k.offsetWidth;k.classList.add("geter");}}
+}
+const bebas=(g,mode,items)=>{S={g,l:0,mode,items,i:0,benar:0,poin:0,p:1,kunci:false,beruntun:0,bebas:true};baru();soal();};
+
+/* ============ GAME TANPA LEVEL ============ */
+const KITAB="Kejadian,Keluaran,Imamat,Bilangan,Ulangan,Yosua,Hakim-hakim,Rut,1 Samuel,2 Samuel,1 Raja-raja,2 Raja-raja,1 Tawarikh,2 Tawarikh,Ezra,Nehemia,Ester,Ayub,Mazmur,Amsal,Pengkhotbah,Kidung Agung,Yesaya,Yeremia,Ratapan,Yehezkiel,Daniel,Hosea,Yoel,Amos,Obaja,Yunus,Mikha,Nahum,Habakuk,Zefanya,Hagai,Zakharia,Maleakhi,Matius,Markus,Lukas,Yohanes,Kisah Para Rasul,Roma,1 Korintus,2 Korintus,Galatia,Efesus,Filipi,Kolose,1 Tesalonika,2 Tesalonika,1 Timotius,2 Timotius,Titus,Filemon,Ibrani,Yakobus,1 Petrus,2 Petrus,1 Yohanes,2 Yohanes,3 Yohanes,Yudas,Wahyu".split(",");
+const MINI={
+ 11(){bebas(11,"kuis",acak([...Array(65).keys()]).slice(0,10).map(i=>({tanya:`Setelah kitab ${KITAB[i]}, kitab apa berikutnya?`,jawab:KITAB[i+1],
+  opsi:acak([KITAB[i+1],...acak(KITAB.filter((_,k)=>k!==i&&k!==i+1)).slice(0,3)])})));},
+ 10(){let lempar=0,kena=0,x=50,t0=performance.now();
+  app.innerHTML=`<div class="kartu"><h2>🪨 Daud Melempar Batu</h2><p class="info">Ketuk "Lempar!" saat Goliat ada di area hijau. 5 lemparan, makin lama makin cepat.</p>
+   <div class="medan2"><div class="tengah"></div><div id="gol" class="gol">🧌</div></div><p class="umpan" id="inf">Lemparan 1 dari 5</p><button class="btn" id="lp">🪨 Lempar!</button></div>`;
+  const gerak=t=>{const g=$("#gol");if(!g) return;x=50+44*Math.sin((t-t0)/(420-lempar*60));g.style.left=x+"%";requestAnimationFrame(gerak)};
+  requestAnimationFrame(gerak);
+  $("#lp").onclick=()=>{const ok=Math.abs(x-50)<9;lempar++;if(ok)kena++;efek(ok);
+   if(lempar>=5){$("#inf").innerHTML=`${kena>=3?"🎉 Hebat! ":""}Kena ${kena} dari 5. <button class="btn" onclick="MINI[10]()">🔁 Main lagi</button>`;$("#lp").remove();}
+   else $("#inf").textContent=(ok?"💥 Kena! ":"Meleset. ")+`Lemparan ${lempar+1} dari 5`;};},
+ 14(){const baik=["Kasih","Sukacita","Damai sejahtera","Kesabaran","Kemurahan","Kebaikan","Kesetiaan","Kelemahlembutan","Penguasaan diri"],
+   buruk=["Marah","Iri hati","Sombong","Berbohong","Malas"];let skor=0,sisa=30;
+  app.innerHTML=`<div class="kartu"><h2>🍇 Buah Roh</h2><p class="info">Ketuk buah roh yang baik (🍇). Jangan ketuk sifat buruk (🕷️)! Waktu: <b id="w">30</b> detik • Skor: <b id="sk">0</b></p><div id="medan"></div></div>`;
+  const medan=$("#medan");
+  const bunuh=()=>{clearInterval(a);clearInterval(j)};
+  const a=setInterval(()=>{if(!$("#medan")) return bunuh();
+   const b=Math.random()<.65,t=(b?baik:buruk)[Math.floor(Math.random()*(b?baik:buruk).length)],e=document.createElement("button");
+   e.className="jatuh";e.textContent=(b?"🍇 ":"🕷️ ")+t;e.style.left=Math.random()*55+"%";
+   e.onclick=()=>{skor=Math.max(0,skor+(b?1:-1));$("#sk").textContent=skor;efek(b);e.remove()};
+   e.addEventListener("animationend",()=>e.remove());medan.append(e)},900);
+  const j=setInterval(()=>{if(!$("#medan")) return bunuh();sisa--;$("#w").textContent=sisa;
+   if(sisa<=0){bunuh();app.innerHTML=`<div class="kartu"><div class="besar">${skor>=15?"🏆":"🍇"}</div><h2 style="text-align:center">Skor: ${skor}</h2>
+    <p class="info" style="text-align:center">${skor>=15?"Luar biasa!":"Ayo coba lagi!"}</p><button class="btn" onclick="MINI[14]()">🔁 Main lagi</button></div>`;}},1000);}
+};
+
+/* ============ DATA TAMBAHAN ============ */
+const BENDA=[
+"Bahtera|Aku dibuat dari kayu gofir.|Aku sangat besar dan berisi banyak hewan.|Aku terapung saat air bah.",
+"Manna|Aku turun setiap pagi.|Aku seperti serpihan putih.|Aku makanan Israel di padang gurun.",
+"Tongkat Musa|Aku berubah menjadi ular.|Aku diangkat saat Laut Merah terbelah.|Aku dipegang Musa.",
+"Umban|Aku dipakai seorang gembala.|Aku melontarkan batu.|Aku mengalahkan Goliat.",
+"Pelangi|Aku muncul setelah hujan.|Aku tanda janji Allah kepada Nuh.|Aku berwarna-warni di langit.",
+"Bintang Betlehem|Aku bersinar di langit.|Orang majus mengikuti aku.|Aku menunjuk tempat lahir Yesus.",
+"Palungan|Aku tempat makan hewan.|Aku terbuat dari kayu atau batu.|Bayi Yesus dibaringkan di dalamku.",
+"Salib|Aku dibuat dari kayu.|Aku tempat Yesus mati.|Aku lambang kasih Allah.",
+"Taman Eden|Ada empat sungai mengalir dariku.|Ada pohon pengetahuan di tengahku.|Adam dan Hawa tinggal di sini.",
+"Laut Merah|Aku dilewati bangsa Israel.|Aku terbelah menjadi dua.|Tentara Mesir tenggelam di dalamku.",
+"Gunung Sinai|Awan dan api menyelubungi aku.|Allah turun di atasku.|Musa menerima Sepuluh Perintah di sini.",
+"Bait Allah|Salomo membangun aku.|Aku tempat beribadah di Yerusalem.|Aku rumah Tuhan.",
+"Pohon Ara|Aku pohon yang rindang.|Seorang pemungut cukai memanjat aku.|Zakheus naik ke atasku.",
+"Jala|Aku dipakai para nelayan.|Aku penuh ikan setelah Yesus berkata.|Murid-murid menebarkan aku di Danau Galilea.",
+"Merpati|Aku burung kecil.|Aku membawa ranting zaitun kepada Nuh.|Aku turun saat Yesus dibaptis.",
+"Domba|Aku berbulu dan mengembik.|Seorang gembala mencariku ketika aku hilang.|Yesus menyebut diri-Nya gembala yang baik bagiku."];
+
+const KISAH=[[
+"Allah menciptakan terang|Allah menciptakan langit dan laut|Allah menciptakan manusia",
+"Nuh membuat bahtera|Hujan turun 40 hari|Pelangi muncul di langit",
+"Malaikat menemui Maria|Yesus lahir di Betlehem|Orang majus datang menyembah"
+],[
+"Daud menjaga domba|Daud mengalahkan Goliat|Daud menjadi raja",
+"Yunus lari naik kapal|Yunus ditelan ikan besar|Yunus pergi ke Niniwe",
+"Yesus disalibkan|Yesus dikuburkan|Yesus bangkit pada hari ketiga"
+],[
+"Musa ditemukan di Sungai Nil|Allah memanggil Musa dari semak menyala|Israel menyeberangi Laut Merah|Musa menerima Sepuluh Perintah",
+"Yusuf dijual saudaranya|Yusuf dipenjara di Mesir|Yusuf menafsirkan mimpi Firaun|Yusuf menjadi penguasa Mesir",
+"Yesus dibaptis|Yesus memilih dua belas murid|Yesus memberi makan 5.000 orang|Yesus disalibkan"
+],[
+"Israel keluar dari Mesir|Israel menerima Taurat di Sinai|Israel mengembara di padang gurun|Yosua memimpin masuk Kanaan|Tembok Yerikho runtuh",
+"Saul menjadi raja|Daud menjadi raja|Salomo membangun Bait Allah|Kerajaan terbagi dua",
+"Saulus bertemu Yesus di jalan Damsyik|Paulus dibaptis|Paulus memulai perjalanan misi pertama|Paulus ditangkap di Yerusalem|Paulus dibawa ke Roma"
+],[
+"Yerusalem ditaklukkan Babel|Daniel dibawa ke Babel|Tiga sahabat dilempar ke perapian|Belsyazar melihat tulisan di dinding|Daniel dilempar ke gua singa",
+"Yesus naik ke surga|Murid-murid menerima Roh Kudus|Petrus berkhotbah kepada ribuan orang|Stefanus dirajam|Paulus bertobat",
+"Yesus dibaptis Yohanes|Yesus dicobai di padang gurun|Yesus mengubah air menjadi anggur|Yesus membangkitkan Lazarus|Yesus masuk Yerusalem naik keledai|Yesus ditangkap di Taman Getsemani"
+]];
+
+const MUKJIZAT=["🌊🚶|Yesus berjalan di atas air","🍞🐟|Yesus memberi makan 5.000 orang","🏺🍷|Air menjadi anggur","⛈️🛶|Yesus meredakan badai","👁️✨|Yesus menyembuhkan orang buta","⚰️🌿|Lazarus dibangkitkan","🌊🌊🏃|Laut Merah terbelah","🦁😇|Daniel di gua singa","🔥🧍🧍🧍|Tiga sahabat di perapian","🧱🎺|Tembok Yerikho runtuh","☁️🍞|Manna dari langit","🐋🙏|Yunus dalam perut ikan"];
+
+/* ============ GAME BERLEVEL TAMBAHAN ============ */
+function selesai(g,l,skor,pesan){
+  if(skor>nilai(g,l)){prog[g]=prog[g]||{};prog[g][l]=skor;simpan();}
+  app.innerHTML=`<div class="kartu"><div class="besar">${bintang(skor)}</div><h2 style="text-align:center">${pesan}</h2>
+   ${l===5?'<p class="umpan" style="text-align:center">🏆 Kamu sudah menamatkan semua level!</p>':""}
+   <div>${l<5?`<button class="btn" onclick="mulai(${g},${l+1})">Level ${l+1} ▶</button>`:""}<button class="btn" onclick="mulai(${g},${l})">🔁 Main lagi</button><button class="btn abu" onclick="menuLevel(${g})">Pilih level</button></div></div>`;
+  efek(true);
+}
+const MULAI={
+ 4(l){const P=[["a","<span style='font-size:1.7rem'>🚢</span><small>Bahtera</small>","Nuh"],["b","<span style='font-size:1.7rem'>🪨</span><small>Umban</small>","Daud"],["c","<span style='font-size:1.7rem'>🦁</span><small>Gua singa</small>","Daniel"],["d","<span style='font-size:1.7rem'>🐋</span><small>Ikan besar</small>","Yunus"],["e","<span style='font-size:1.7rem'>🔥</span><small>Semak menyala</small>","Musa"],["f","<span style='font-size:1.7rem'>🌳</span><small>Pohon ara</small>","Zakheus"],["g","<span style='font-size:1.7rem'>🧥</span><small>Jubah warna-warni</small>","Yusuf"],["h","<span style='font-size:1.7rem'>💇</span><small>Rambut panjang</small>","Simson"],["i","<span style='font-size:1.7rem'>⭐</span><small>Bintang Betlehem</small>","Orang majus"],["j","<span style='font-size:1.7rem'>🐑</span><small>Domba hilang</small>","Gembala yang baik"],["k","<span style='font-size:1.7rem'>🧱</span><small>Tembok runtuh</small>","Yosua"],["l","<span style='font-size:1.7rem'>👑</span><small>Hikmat</small>","Salomo"]];
+  const n=[4,6,8,10,12][l-1];let buka=[],cocok=0,gerak=0,kunci=false;
+  app.innerHTML=`<div class="kartu muncul"><h2>🃏 Memory Card • Level ${l}</h2><p class="info">Cocokkan benda atau kisah dengan tokohnya (${n} pasang). Gerakan: <b id="gk">0</b></p>
+   <div class="grid4" id="kb">${acak(acak(P).slice(0,n).flatMap(p=>[[p[0],p[1]],[p[0],"<small>"+p[2]+"</small>"]])).map(p=>`<button class="lv hewan mem" data-i="${p[0]}" data-f="${p[1]}">❓</button>`).join("")}</div></div>`;
+  document.querySelectorAll("#kb button").forEach(b=>b.onclick=()=>{
+   if(kunci||b.disabled||buka.includes(b)) return;
+   b.classList.add("buka");b.innerHTML=b.dataset.f;buka.push(b);
+   if(buka.length<2) return;
+   gerak++;$("#gk").textContent=gerak;const [x,y]=buka;
+   if(x.dataset.i===y.dataset.i){[x,y].forEach(t=>{t.disabled=true;t.classList.add("cocok")});buka=[];cocok++;efek(true);
+    if(cocok===n) setTimeout(()=>selesai(4,l,gerak<=n*1.5?10:gerak<=n*2.2?9:7,`Selesai dalam ${gerak} gerakan!`),900);}
+   else{kunci=true;efek(false);setTimeout(()=>{[x,y].forEach(t=>{t.classList.remove("buka");t.textContent="❓"});buka=[];kunci=false},800);}});},
+ 6(l){const cerita=acak(KISAH[l-1]).map(t=>t.split("|"));let c=0,salah=0;
+  const babak=()=>{
+   if(c>=3) return selesai(6,l,salah===0?10:salah<=2?9:7,salah?`Selesai, ${salah} kali salah ketuk`:"Sempurna, tanpa salah!");
+   const urut=cerita[c];let maju=0;
+   app.innerHTML=`<div class="kartu muncul"><div class="status"><span>Level ${l} • Kisah ${c+1} dari 3</span><span id="sl">❌ ${salah}</span></div>
+    <h2>Ketuk kejadian sesuai urutan yang benar</h2><div id="pilihan">${acak(urut).map(t=>`<button class="opt">${t}</button>`).join("")}</div></div>`;
+   document.querySelectorAll("#pilihan .opt").forEach(b=>b.onclick=()=>{
+    if(b.textContent===urut[maju]){maju++;b.classList.add("ok");b.disabled=true;b.textContent=maju+". "+b.textContent;
+     if(maju===urut.length){efek(true);setTimeout(()=>{c++;babak()},1000);}}
+    else{salah++;$("#sl").textContent="❌ "+salah;efek(false);}});};
+  babak();}
+};
+MINI[13]=()=>bebas(13,"kuis",acak(MUKJIZAT).slice(0,10).map(m=>{const [e,n]=m.split("|");
+  return {tanya:`<span style="font-size:3rem;display:block;text-align:center">${e}</span>Kejadian apa ini?`,jawab:n,
+   opsi:acak([n,...acak(MUKJIZAT.map(z=>z.split("|")[1]).filter(z=>z!==n)).slice(0,3)])};}));
+
+/* ============ KALIMAT (game 2 dan 5) ============ */
+// Kalimat ditulis sendiri (bukan kutipan ayat). Kata bertanda *...* dipakai di game 5.
+const KALIMAT=[[
+"Allah menciptakan *langit* dan bumi","Nuh membuat *bahtera* besar","Daud mengalahkan *Goliat*","Yesus lahir di *Betlehem*","Musa memimpin bangsa *Israel*"
+],[
+"Yunus berada tiga hari dalam perut *ikan*","Daniel tidak takut di gua *singa*","Yesus memberi makan lima ribu orang dengan *roti*","Zakheus naik pohon *ara* untuk melihat Yesus","Yohanes membaptis Yesus di Sungai *Yordan*"
+],[
+"Yusuf dijual saudaranya lalu menjadi penguasa di *Mesir*","Ester berani menghadap raja demi menyelamatkan bangsa *Yahudi*","Tembok kota *Yerikho* runtuh setelah Israel mengelilinginya","Musa menerima Sepuluh Perintah Allah di Gunung *Sinai*","Salomo meminta *hikmat* kepada Allah"
+],[
+"Yesus membangkitkan Lazarus dari kubur di kota *Betania*","Saulus bertobat setelah bertemu Yesus di jalan menuju *Damsyik*","Gideon mengalahkan bangsa *Midian* hanya dengan tiga ratus orang","Nehemia memimpin pembangunan kembali tembok kota *Yerusalem*","Rut setia mengikuti mertuanya *Naomi* ke Betlehem"
+],[
+"Pada hari *Pentakosta* para murid dipenuhi Roh Kudus","Yohanes menerima penglihatan Kitab Wahyu di pulau *Patmos*","Daniel dan tiga sahabatnya dibawa ke *Babel* setelah Yerusalem ditaklukkan","Sebelum ada raja, Israel dipimpin oleh para *hakim*","Raja *Belsyazar* melihat tangan menulis di dinding istana"
+]];
+const KEYS=KALIMAT.flat().map(t=>t.match(/\*(.+?)\*/)[1]);
+GAME[5]={mode:"kuis",data:KALIMAT.map(lv=>lv.map(t=>{const k=t.match(/\*(.+?)\*/)[1];return [t.replace(/\*.+?\*/,"_____"),k,...acak(KEYS.filter(x=>x!==k)).slice(0,3)].join("|")}))};
+
+Object.assign(MULAI,{
+ 3(l){const kata=acak(KUIS[l-1].map(t=>t.split("|")).filter(b=>/^[A-Za-z]{3,}$/.test(b[1])));let i=0,benar=0;
+  const babak=()=>{
+   if(i>=kata.length) return selesai(3,l,Math.round(benar*10/kata.length),`${benar} dari ${kata.length} kata tertebak`);
+   const [q,a]=kata[i],W=a.toUpperCase(),tebak=new Set();let nyawa=6;
+   const gambar=()=>{const sel=[...W].every(c=>tebak.has(c)),mati=nyawa<=0,akhir=sel||mati;
+    app.innerHTML=`<div class="kartu"><div class="status"><span>Level ${l} • Kata ${i+1} dari ${kata.length}</span><span>${"❤️".repeat(nyawa)||"💔"}</span></div>
+     <h2>${q}</h2><p class="besar" style="font-size:2rem;letter-spacing:4px">${[...W].map(c=>tebak.has(c)||mati?c:"_").join(" ")}</p>
+     ${akhir?`<p class="umpan">${sel?"🎉 Benar!":"Jawabannya: "+a}</p><button class="btn" id="lj">${i+1===kata.length?"Lihat hasil":"Lanjut ▶"}</button>`
+      :`<div class="kbd">${[..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"].map(c=>`<button data-c="${c}" ${tebak.has(c)?"disabled":""}>${c}</button>`).join("")}</div>`}</div>`;
+    if(akhir) $("#lj").onclick=()=>{i++;babak()};
+    else document.querySelectorAll(".kbd button").forEach(b=>b.onclick=()=>{const c=b.dataset.c;tebak.add(c);
+     if(!W.includes(c)){nyawa--;}
+     gambar();
+     if([...W].every(x=>tebak.has(x))){benar++;efek(true)}else if(!W.includes(c)||nyawa<=0)efek(false);});};
+   gambar();};
+  babak();},
+ 2(l){const k=acak(KALIMAT[l-1]).map(t=>t.replace(/\*/g,"").split(" "));let c=0,salah=0;
+  const babak=()=>{
+   if(c>=k.length) return selesai(2,l,salah===0?10:salah<=3?9:7,salah?`Selesai, ${salah} kali salah ketuk`:"Sempurna, tanpa salah!");
+   const w=k[c];let maju=0;
+   app.innerHTML=`<div class="kartu muncul"><div class="status"><span>Level ${l} • Kalimat ${c+1} dari ${k.length}</span><span id="sl">❌ ${salah}</span></div>
+    <h2>Susun kata menjadi kalimat</h2><p class="petunjuk" id="hasil">…</p><div class="kata">${acak(w).map(t=>`<button class="lv">${t}</button>`).join("")}</div></div>`;
+   document.querySelectorAll(".kata .lv").forEach(b=>b.onclick=()=>{
+    if(b.textContent===w[maju]){maju++;b.disabled=true;$("#hasil").textContent=w.slice(0,maju).join(" ");
+     if(maju===w.length){efek(true);setTimeout(()=>{c++;babak()},1000);}}
+    else{salah++;$("#sl").textContent="❌ "+salah;efek(false);}});};
+  babak();},
+ 8(l){const n=[6,7,8,9,10][l-1],jum=[4,5,6,7,8][l-1],ada=[];
+  const kata=acak([...new Set(TOKOH.flat().map(t=>t.split("|")[0].toUpperCase()).filter(w=>/^[A-Z]{3,8}$/.test(w)&&w.length<=n))]);
+  const g=Array.from({length:n},()=>Array(n).fill("")),arah=[[0,1],[1,0]].concat(l>=4?[[1,1]]:[]);
+  for(const w of kata){if(ada.length>=jum)break;
+   for(let t=0;t<200;t++){const [dy,dx]=arah[Math.floor(Math.random()*arah.length)],y=Math.floor(Math.random()*n),x=Math.floor(Math.random()*n);
+    if(y+dy*(w.length-1)>=n||x+dx*(w.length-1)>=n) continue;
+    if([...w].every((c,k)=>!g[y+dy*k][x+dx*k]||g[y+dy*k][x+dx*k]===c)){[...w].forEach((c,k)=>g[y+dy*k][x+dx*k]=c);ada.push(w);break;}}}
+  app.innerHTML=`<div class="kartu muncul"><h2>🔍 Cari Kata • Level ${l}</h2><p class="info">Ketuk huruf pertama, lalu huruf terakhir dari sebuah kata.</p>
+   <div class="gk" style="grid-template-columns:repeat(${n},1fr)">${g.map((r,y)=>r.map((c,x)=>`<button data-y="${y}" data-x="${x}">${c||"ABDEHIKLMNORSTU"[Math.floor(Math.random()*15)]}</button>`).join("")).join("")}</div>
+   <p class="info">${ada.map(w=>`<span id="w_${w}">${w}</span>`).join(" • ")}</p></div>`;
+  const sel=[...document.querySelectorAll(".gk button")],sisa=new Set(ada);let a=null;
+  sel.forEach(b=>b.onclick=()=>{
+   if(!a){a=b;b.classList.add("pilih");return}
+   const y1=+a.dataset.y,x1=+a.dataset.x,dy=+b.dataset.y-y1,dx=+b.dataset.x-x1,m=Math.max(Math.abs(dy),Math.abs(dx));
+   a.classList.remove("pilih");let ok=false;
+   if(m>0&&(dy===0||dx===0||Math.abs(dy)===Math.abs(dx))){
+    const cs=[];for(let k=0;k<=m;k++)cs.push(sel[(y1+Math.sign(dy)*k)*n+x1+Math.sign(dx)*k]);
+    const w=cs.map(c=>c.textContent).join(""),r=[...w].reverse().join(""),h=sisa.has(w)?w:sisa.has(r)?r:null;
+    if(h){ok=true;sisa.delete(h);cs.forEach(c=>c.classList.add("cocok"));$("#w_"+h).style.textDecoration="line-through";efek(true);
+     if(!sisa.size) setTimeout(()=>selesai(8,l,10,"Semua kata ditemukan!"),900);}}
+   if(!ok) efek(false);
+   a=null;});}
+});
+
+MINI[15]=()=>{const it=acak(BENDA.map(t=>t.split("|"))).slice(0,6);let sel=null,sisa=6,salah=0;
+  app.innerHTML=`<div class="kartu muncul"><h2>🔗 Jodohkan Benda & Tempat Alkitab</h2><p class="info">Ketuk satu petunjuk, lalu ketuk nama benda atau tempat yang cocok.</p>
+   <div class="dua"><div>${it.map(b=>`<button class="opt" data-k="${b[0]}">${b[3]}</button>`).join("")}</div><div>${acak(it).map(b=>`<button class="opt" data-k="${b[0]}">${b[0]}</button>`).join("")}</div></div><p class="umpan" id="inf"></p></div>`;
+  document.querySelectorAll(".dua .opt").forEach(b=>b.onclick=()=>{
+   if(b.disabled) return;
+   if(sel&&sel.parentNode===b.parentNode){sel.classList.remove("pilih");sel=b;b.classList.add("pilih");return}
+   if(!sel){sel=b;b.classList.add("pilih");return}
+   sel.classList.remove("pilih");
+   if(sel.dataset.k===b.dataset.k){[sel,b].forEach(x=>{x.disabled=true;x.classList.add("ok")});efek(true);sisa--;
+    if(!sisa) $("#inf").innerHTML=`🎉 Semua cocok! (${salah} kali salah) <button class="btn" onclick="MINI[15]()">🔁 Main lagi</button>`;}
+   else{salah++;efek(false);}
+   sel=null;});};
+
+MINI[9]=()=>{const H=["🐘","🦒","🦁","🐑","🐢","🦓","🐇","🐻"];let pilih=null,sisa=H.length;
+  app.innerHTML=`<div class="kartu muncul"><h2>🧩 Puzzle Pasangan Hewan Bahtera</h2><p class="info">Hewan di bahtera Nuh masuk berpasangan. Ketuk hewan di bagian bawah, lalu ketuk tempat kosong yang bentuknya cocok.</p>
+   <div class="ark">${H.map(h=>`<div class="pasang"><span>${h}</span><button class="slot" data-h="${h}">${h}</button></div>`).join("")}</div>
+   <p class="info">Hewan yang belum masuk:</p><div class="tray">${acak(H).map(h=>`<button class="lv hewan" data-h="${h}">${h}</button>`).join("")}</div><p class="umpan" id="inf"></p></div>`;
+  document.querySelectorAll(".tray button").forEach(b=>b.onclick=()=>{
+   if(b.disabled) return;
+   document.querySelectorAll(".tray .pilih").forEach(x=>x.classList.remove("pilih"));
+   b.classList.add("pilih");pilih=b;});
+  document.querySelectorAll(".slot").forEach(t=>t.onclick=()=>{
+   if(!pilih||t.classList.contains("isi")) return;
+   if(pilih.dataset.h===t.dataset.h){t.classList.add("isi");pilih.disabled=true;pilih.classList.remove("pilih");pilih.classList.add("masuk");pilih=null;efek(true);sisa--;
+    if(!sisa) $("#inf").innerHTML=`🎉 Semua pasangan lengkap, bahtera siap berlayar! <button class="btn" onclick="MINI[9]()">🔁 Main lagi</button>`;}
+   else efek(false);});};
+
+/* ============ TTS (game 7) ============ */
+function buatTTS(kata){
+  let best=null;
+  for(let t=0;t<300&&!(best&&best.pl.length===kata.length);t++){
+    const G=new Map(),D=new Map(),pl=[],K=(y,x)=>y+","+x;
+    const taruh=(w,c,y,x,dy,dx)=>{[...w].forEach((ch,k)=>{const q=K(y+dy*k,x+dx*k);G.set(q,ch);D.set(q,(D.get(q)||"")+(dy?"v":"h"))});pl.push({w,c,y,x,dy,dx})};
+    const bisa=(w,y,x,dy,dx)=>{
+      if(G.has(K(y-dy,x-dx))||G.has(K(y+dy*w.length,x+dx*w.length))) return false;
+      let sil=0;
+      for(let k=0;k<w.length;k++){const yy=y+dy*k,xx=x+dx*k,q=K(yy,xx);
+        if(G.has(q)){if(G.get(q)!==w[k]||D.get(q).includes(dy?"v":"h")) return false;sil++;}
+        else if(G.has(K(yy+dx,xx+dy))||G.has(K(yy-dx,xx-dy))) return false;}
+      return sil>0;};
+    const urut=acak(kata);taruh(urut[0][0],urut[0][1],0,0,0,1);
+    for(const [w,c] of urut.slice(1)){let ok=false;
+      for(const [q,ch] of acak([...G])){const [cy,cx]=q.split(",").map(Number);
+        for(let k=0;k<w.length&&!ok;k++){if(w[k]!==ch) continue;
+          for(const [dy,dx] of acak([[0,1],[1,0]])){const y=cy-dy*k,x=cx-dx*k;if(bisa(w,y,x,dy,dx)){taruh(w,c,y,x,dy,dx);ok=true;break;}}}
+        if(ok) break;}}
+    if(!best||pl.length>best.pl.length) best={pl,G};
+  }
+  return best;
+}
+MULAI[7]=l=>{
+  const kata=TOKOH[l-1].map(t=>t.split("|")).filter(b=>/^[A-Za-z]+$/.test(b[0])).map(b=>[b[0].toUpperCase(),b[3]]);
+  const h=buatTTS(acak(kata).slice(0,[4,5,6,7,8][l-1]));
+  const ks=[...h.G.keys()].map(k=>k.split(",").map(Number)),Y=ks.map(a=>a[0]),X=ks.map(a=>a[1]);
+  const y0=Math.min(...Y),y1=Math.max(...Y),x0=Math.min(...X),x1=Math.max(...X);
+  const urut=[...h.pl].sort((a,b)=>a.y-b.y||a.x-b.x),no=new Map();let n=0;
+  urut.forEach(q=>{const k=q.y+","+q.x;if(!no.has(k)) no.set(k,++n);});
+  let sel="";
+  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const ch=h.G.get(y+","+x);
+    sel+=ch?`<div class="tc"><sup>${no.get(y+","+x)||""}</sup><input maxlength="1" data-a="${ch}" autocapitalize="characters" autocomplete="off"></div>`:`<div></div>`;}
+  const daftar=(dy,j)=>`<p class="info"><b>${j}</b><br>${urut.filter(q=>q.dy===dy).map(q=>no.get(q.y+","+q.x)+". "+q.c).join("<br>")}</p>`;
+  let coba=0;
+  app.innerHTML=`<div class="kartu muncul"><h2>✏️ Teka-teki Silang • Level ${l}</h2><p class="info">Isi nama tokoh sesuai petunjuk. Geser kotak ke samping jika terlalu lebar.</p>
+   <div style="overflow-x:auto"><div class="tg" style="grid-template-columns:repeat(${x1-x0+1},30px)">${sel}</div></div>
+   ${daftar(0,"Mendatar ➡️")}${daftar(1,"Menurun ⬇️")}<button class="btn" id="cek">✅ Periksa</button></div>`;
+  $("#cek").onclick=()=>{coba++;let semua=true;
+    document.querySelectorAll(".tg input").forEach(i=>{const ok=i.value.toUpperCase()===i.dataset.a;i.style.background=ok?"#d6f3e4":i.value?"#fde1e1":"#fff";if(!ok) semua=false;});
+    if(semua) selesai(7,l,coba<=1?10:coba<=3?9:7,`TTS selesai, ${coba} kali periksa!`);else efek(false);};
+};
+
+/* ============ PETA PAULUS (game 12) ============ */
+const KOTA=[
+["Roma",8.3,12.4,"Paulus dibawa ke kota ini untuk diadili di hadapan Kaisar."],
+["Atena",45.7,28,"Di sini Paulus berbicara di Areopagus tentang Allah yang tidak dikenal."],
+["Filipi",47.7,16,"Paulus dan Silas dipenjara di kota ini, lalu gempa membuka pintu penjara."],
+["Efesus",57.7,28.4,"Di kota ini terjadi kerusuhan para tukang perak yang membuat patung dewi Artemis."],
+["Antiokhia",87.3,35.2,"Di kota ini para pengikut Yesus pertama kali disebut Kristen."],
+["Damsyik",87.7,46,"Paulus bertemu Yesus dalam cahaya di jalan menuju kota ini."],
+["Yerusalem",84,52.8,"Paulus ditangkap di Bait Allah di kota ini."],
+["Malta",14.7,36.4,"Kapal Paulus karam dan mereka mendarat di pulau ini."]];
+MINI[12]=()=>{const q=acak(KOTA);let i=0,salah=0;
+  const peta=ok=>`<svg viewBox="0 0 100 60" style="width:100%;display:block;border-radius:14px"><rect width="100" height="60" fill="#cfe8ff"/>
+   <polygon points="3,6 9,3 14,5 12,10 14,16 16,22 13,24 10,18 7,15 4,10" fill="#f3e9c6"/><polygon points="38,0 56,0 58,8 52,16 48,18 50,24 47,32 44,26 43,18 40,10" fill="#f3e9c6"/>
+   <polygon points="54,24 70,20 100,22 100,60 82,60 83,45 80,37 66,34 56,33" fill="#f3e9c6"/><circle cx="14.7" cy="36.4" r="2" fill="#f3e9c6"/>
+   ${KOTA.map(k=>`<g data-k="${k[0]}" style="cursor:pointer"><circle cx="${k[1]}" cy="${k[2]}" r="1.6" fill="${ok.includes(k[0])?"#2fa96b":"#e8575a"}"/>
+   <text x="${k[1]+(k[1]>70?-2.6:2.6)}" y="${k[2]+1}" font-size="3" text-anchor="${k[1]>70?"end":"start"}" fill="#1b2a4e">${k[0]}</text><circle cx="${k[1]}" cy="${k[2]}" r="3.4" fill="transparent"/></g>`).join("")}</svg>`;
+  const tampil=()=>{
+    if(i>=q.length){const sk=salah===0?10:salah<=3?9:7;
+      app.innerHTML=`<div class="kartu"><div class="besar">${bintang(sk)}</div><h2 style="text-align:center">Semua tempat ditemukan!</h2><p class="info" style="text-align:center">${salah} kali salah ketuk.</p><button class="btn" onclick="MINI[12]()">🔁 Main lagi</button></div>`;
+      return efek(true);}
+    app.innerHTML=`<div class="kartu muncul"><div class="status"><span>Tempat ${i+1} dari ${q.length}</span><span>❌ ${salah}</span></div><h2>Ketuk tempat yang dimaksud di peta</h2>
+     <p class="petunjuk">💡 ${q[i][3]}</p>${peta(q.slice(0,i).map(k=>k[0]))}<p class="info">Peta ini gambaran sederhana, bukan skala sebenarnya.</p></div>`;
+    document.querySelectorAll("svg g").forEach(g=>g.onclick=()=>{
+      if(g.dataset.k===q[i][0]){efek(true);i++;tampil();}
+      else{salah++;efek(false);document.querySelector(".status span:last-child").textContent="❌ "+salah;}});};
+  tampil();};
+
+beranda();
+</script>
+</body>
+</html>
